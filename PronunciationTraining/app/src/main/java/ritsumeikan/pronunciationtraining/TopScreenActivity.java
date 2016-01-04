@@ -128,6 +128,8 @@ public class TopScreenActivity extends ActionBarActivity {
                 public void onSuccess() {
                     // TODO: after login
                     Log.d(TAG, "login success");
+                    Intent intent = new Intent(TopScreenActivity.this, JoinClassActivity.class);
+                    startActivity(intent);
                 }
             });
         }

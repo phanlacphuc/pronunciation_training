@@ -31,7 +31,10 @@
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
         <activity
             android:name=".MessagingActivity"
-            android:label="@string/title_activity_messaging"></activity>
+            android:label="@string/title_activity_messaging" />
+        <activity
+            android:name=".JoinClassActivity"
+            android:label="@string/title_activity_join_class"></activity>
     </application>
 
 </manifest>

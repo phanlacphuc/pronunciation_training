@@ -50,6 +50,8 @@ public class Api {
     static String TAG = "Api";
     static Api ourInstance = new Api();
 
+    private ArrayList<String> classArray = new ArrayList<String>();
+
     private AsyncHttpClient mClient = new AsyncHttpClient();
     private AddUserEventListener mAddUserEventListener;
     private NewMessageEventListener mNewMessageEventListener;
@@ -156,6 +158,11 @@ public class Api {
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 // called when response HTTP status is "200 OK"
                 Log.d(TAG, "response = " + response);
+                try {
+                    JSONArray classArrayJSON = response.getJSONArray("classArray");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
                 onCustomSuccessListener.onSuccess();
             }
         });
