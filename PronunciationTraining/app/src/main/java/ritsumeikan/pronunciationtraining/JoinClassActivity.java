@@ -53,11 +53,11 @@ public class JoinClassActivity extends ActionBarActivity {
                 public void onClick(View v) {
                     mDialogCreateNewClass.dismiss();
                     ArrayList<String> wordList = new ArrayList<String>();
-                    wordList.add(((EditText)findViewById(R.id.first_word_edit_text)).getText().toString());
-                    wordList.add(((EditText)findViewById(R.id.second_word_edit_text)).getText().toString());
-                    wordList.add(((EditText)findViewById(R.id.third_word_edit_text)).getText().toString());
-                    wordList.add(((EditText)findViewById(R.id.fourth_word_edit_text)).getText().toString());
-                    wordList.add(((EditText)findViewById(R.id.fifth_word_edit_text)).getText().toString());
+                    wordList.add(((EditText)mDialogCreateNewClass.findViewById(R.id.first_word_edit_text)).getText().toString());
+                    wordList.add(((EditText)mDialogCreateNewClass.findViewById(R.id.second_word_edit_text)).getText().toString());
+                    wordList.add(((EditText)mDialogCreateNewClass.findViewById(R.id.third_word_edit_text)).getText().toString());
+                    wordList.add(((EditText)mDialogCreateNewClass.findViewById(R.id.fourth_word_edit_text)).getText().toString());
+                    wordList.add(((EditText)mDialogCreateNewClass.findViewById(R.id.fifth_word_edit_text)).getText().toString());
                     createClass(wordList);
                 }
             });
@@ -105,11 +105,13 @@ public class JoinClassActivity extends ActionBarActivity {
         Profile profile = Profile.getCurrentProfile();
         if (profile != null) {
             JSONArray wordArray = new JSONArray(wordList);
-            Api.getInstance().createClass(wordArray, profile.getId(), new Api.OnCustomSuccessListener() {
+            Api.getInstance().createClass(wordArray, profile.getId(), new Api.OnJoinClassSuccessListener() {
                 @Override
-                public void onSuccess() {
+                public void onSuccess(String classId, ArrayList<String> wordList) {
                     Log.d(TAG, "created class");
                     Intent intent = new Intent(JoinClassActivity.this, MessagingActivity.class);
+                    intent.putExtra("class_id", classId);
+                    intent.putStringArrayListExtra("wordList", wordList);
                     startActivity(intent);
                 }
             });
@@ -118,11 +120,13 @@ public class JoinClassActivity extends ActionBarActivity {
     private void joinClass(String invitationCode) {
         Profile profile = Profile.getCurrentProfile();
         if (profile != null) {
-            Api.getInstance().joinClass(profile.getId(), invitationCode, new Api.OnCustomSuccessListener() {
+            Api.getInstance().joinClass(profile.getId(), invitationCode, new Api.OnJoinClassSuccessListener() {
                 @Override
-                public void onSuccess() {
+                public void onSuccess(String classId, ArrayList<String> wordList) {
                     Log.d(TAG, "joined class");
                     Intent intent = new Intent(JoinClassActivity.this, MessagingActivity.class);
+                    intent.putExtra("class_id", classId);
+                    intent.putStringArrayListExtra("wordList", wordList);
                     startActivity(intent);
                 }
             });

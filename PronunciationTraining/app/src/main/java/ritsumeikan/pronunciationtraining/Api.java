@@ -29,6 +29,10 @@ public class Api {
         public void onSuccess();
     }
 
+    public interface OnJoinClassSuccessListener{
+        public void onSuccess(String classId, ArrayList<String> wordList);
+    }
+
     public interface AddUserEventListener{
         public void handleEvent(String user);
     }
@@ -158,16 +162,11 @@ public class Api {
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 // called when response HTTP status is "200 OK"
                 Log.d(TAG, "response = " + response);
-                try {
-                    JSONArray classArrayJSON = response.getJSONArray("classArray");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
                 onCustomSuccessListener.onSuccess();
             }
         });
     }
-    public void createClass(JSONArray wordArray, String facebookId, final OnCustomSuccessListener onCustomSuccessListener) {
+    public void createClass(JSONArray wordArray, String facebookId, final OnJoinClassSuccessListener onJoinClassSuccessListener) {
         RequestParams params = new RequestParams();
         params.add("wordArray", wordArray.toString());
         params.add("facebookId", facebookId);
@@ -176,7 +175,21 @@ public class Api {
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 // called when response HTTP status is "200 OK"
                 Log.d(TAG, "response = " + response);
-                onCustomSuccessListener.onSuccess();
+                try {
+                    JSONObject data = response.getJSONObject("data");
+                    String classId = data.getString("classId");
+
+                    ArrayList<String> wordList = new ArrayList<String>();
+                    JSONArray wordArray = data.getJSONArray("wordList");
+                    if (wordArray != null) {
+                        for (int i=0;i<wordArray.length();i++){
+                            wordList.add(wordArray.get(i).toString());
+                        }
+                    }
+                    onJoinClassSuccessListener.onSuccess(classId, wordList);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
@@ -193,7 +206,7 @@ public class Api {
             }
         });
     }
-    public void joinClass(String facebookId, String inviteCode, final OnCustomSuccessListener onCustomSuccessListener) {
+    public void joinClass(String facebookId, String inviteCode, final OnJoinClassSuccessListener onJoinClassSuccessListener) {
         RequestParams params = new RequestParams();
         params.add("facebookId", facebookId);
         params.add("inviteCode", inviteCode);
@@ -202,7 +215,21 @@ public class Api {
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 // called when response HTTP status is "200 OK"
                 Log.d(TAG, "response = " + response);
-                onCustomSuccessListener.onSuccess();
+                try {
+                    JSONObject data = response.getJSONObject("data");
+                    String classId = data.getString("classId");
+
+                    ArrayList<String> wordList = new ArrayList<String>();
+                    JSONArray wordArray = data.getJSONArray("wordList");
+                    if (wordArray != null) {
+                        for (int i=0;i<wordArray.length();i++){
+                            wordList.add(wordArray.get(i).toString());
+                        }
+                    }
+                    onJoinClassSuccessListener.onSuccess(classId, wordList);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
