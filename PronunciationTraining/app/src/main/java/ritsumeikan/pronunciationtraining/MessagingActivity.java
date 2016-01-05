@@ -4,14 +4,14 @@ import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.speech.RecognizerIntent;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.Profile;
@@ -32,15 +32,33 @@ public class MessagingActivity extends ActionBarActivity {
         public long time_in_secs;
     }
 
+    private TextView mCurrentWordTextView;
+    private TextView mCurrentTimeLeftTextView;
     private String mClassId;
     private ArrayList<String> mUsernameArrayList = new ArrayList<String>();
     private ArrayList<SpeechMessage> mSpeechMessageArrayList = new ArrayList<SpeechMessage>();
     private ArrayList<String> mWordList;
+    private int mCurrentWordIndex;
+
+    CountDownTimer mCountDownTimer = new CountDownTimer(31000, 1000) {
+
+        public void onTick(long millisUntilFinished) {
+            mCurrentTimeLeftTextView.setText("remaining: " + millisUntilFinished / 1000 + " secs");
+            //here you can have your logic to set text to edittext
+        }
+
+        public void onFinish() {
+            finishOneWordSession();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_messaging);
+
+        mCurrentWordTextView = (TextView) findViewById(R.id.current_word_text_view);
+        mCurrentTimeLeftTextView = (TextView) findViewById(R.id.current_time_left_text_view);
 
         mClassId = getIntent().getStringExtra("classId");
         mWordList = getIntent().getStringArrayListExtra("wordList");
@@ -51,7 +69,14 @@ public class MessagingActivity extends ActionBarActivity {
                 showDialogInviteFriendByEmail();
             }
         });
-        
+
+        findViewById(R.id.start_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startGame();
+            }
+        });
+
         Api.getInstance().setAddUserEventListener(new Api.AddUserEventListener() {
             @Override
             public void handleEvent(final String username) {
@@ -87,7 +112,8 @@ public class MessagingActivity extends ActionBarActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-
+                        mCurrentWordIndex = -1;
+                        displayNextWord();
                     }
                 });
             }
@@ -118,6 +144,30 @@ public class MessagingActivity extends ActionBarActivity {
     public void onDestroy() {
         super.onDestroy();
         Api.getInstance().disconnectSocket();
+    }
+
+    private void startGame() {
+        Api.getInstance().attemptStartGame(mClassId);
+    }
+
+    private void displayNextWord() {
+        mCurrentWordIndex++;
+        mCurrentWordTextView.setText("word" + (mCurrentWordIndex+1) + ": " + mWordList.get(mCurrentWordIndex));
+        mCountDownTimer.start();
+    }
+
+    private void finishOneWordSession() {
+        if (mCurrentWordIndex < (mWordList.size() - 1)) {
+            displayNextWord();
+        } else {
+            finishGame();
+        }
+    }
+
+    private void finishGame() {
+        // TODO: transit to result screen
+        Api.getInstance().attemptDisconnectGame();
+
     }
 
     private void showDialogInviteFriendByEmail() {

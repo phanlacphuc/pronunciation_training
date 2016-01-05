@@ -66,6 +66,7 @@ public class Api {
         @Override
         public void call(Object... args) {
 
+            Log.d(TAG, "onAddUser");
             JSONObject data = (JSONObject) args[0];
             String userId;
             try {
@@ -74,6 +75,7 @@ public class Api {
                     mAddUserEventListener.handleEvent(userId);
                 }
             } catch (JSONException e) {
+                e.printStackTrace();
                 return;
             }
 
@@ -84,6 +86,7 @@ public class Api {
         @Override
         public void call(Object... args) {
 
+            Log.d(TAG, "onNewMessage");
             JSONObject data = (JSONObject) args[0];
             String userId;
             String message;
@@ -94,6 +97,7 @@ public class Api {
                     mNewMessageEventListener.handleEvent(userId, message);
                 }
             } catch (JSONException e) {
+                e.printStackTrace();
                 return;
             }
 
@@ -104,10 +108,11 @@ public class Api {
         @Override
         public void call(Object... args) {
 
+            Log.d(TAG, "onStartGame");
             JSONObject data = (JSONObject) args[0];
             ArrayList<String> wordList = new ArrayList<String>();
             try {
-                JSONArray wordListJsonArray = data.getJSONArray("word list");
+                JSONArray wordListJsonArray = data.getJSONArray("wordList");
                 // TODO: save word list to array
 
                 if (mStartGameEventListener != null) {
@@ -125,6 +130,7 @@ public class Api {
         @Override
         public void call(Object... args) {
 
+            Log.d(TAG, "onDisconnect");
             // TODO: Disconnect
 
 
@@ -254,6 +260,7 @@ public class Api {
     }
 
     public void attemptAddUser(String userId) {
+        Log.d(TAG, "attemptAddUser:" + userId);
         if (TextUtils.isEmpty(userId)) {
             return;
         }
@@ -261,6 +268,7 @@ public class Api {
     }
 
     public void attemptSendMessage(String message) {
+        Log.d(TAG, "attemptSendMessage:" + message);
         if (TextUtils.isEmpty(message)) {
             return;
         }
@@ -268,10 +276,12 @@ public class Api {
     }
 
     public void attemptStartGame(String classId) {
+        Log.d(TAG, "attemptStartGame:" + classId);
         mSocket.emit("start game", classId);
     }
 
     public void attemptDisconnectGame() {
+        Log.d(TAG, "attemptDisconnect:");
         mSocket.emit("disconnect");
     }
 
