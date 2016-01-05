@@ -36,7 +36,7 @@ public class Api {
     }
 
     public interface AddUserEventListener{
-        public void handleEvent(String user);
+        public void handleEvent(String userId, String username, String avatar);
     }
 
     public interface NewMessageEventListener{
@@ -68,13 +68,17 @@ public class Api {
         @Override
         public void call(Object... args) {
 
-            Log.d(TAG, "onAddUser");
-            JSONObject data = (JSONObject) args[0];
+            JSONObject receivedJSONObject = (JSONObject) args[0];
+            Log.d(TAG, "onAddUser: receivedJSONObject = " + receivedJSONObject);
             String userId;
+            String username;
+            String avatar;
             try {
-                userId= data.getString("userId");
+                userId = receivedJSONObject.getString("userId");
+                username = receivedJSONObject.getString("username");
+                avatar = receivedJSONObject.getString("avatar");
                 if (mAddUserEventListener != null) {
-                    mAddUserEventListener.handleEvent(userId);
+                    mAddUserEventListener.handleEvent(userId, username, avatar);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -88,13 +92,13 @@ public class Api {
         @Override
         public void call(Object... args) {
 
-            Log.d(TAG, "onNewMessage");
-            JSONObject data = (JSONObject) args[0];
+            JSONObject receivedJSONObject = (JSONObject) args[0];
+            Log.d(TAG, "onNewMessage: receivedJSONObject = " + receivedJSONObject);
             String userId;
             String message;
             try {
-                userId = data.getString("userId");
-                message = data.getString("message");
+                userId = receivedJSONObject.getString("userId");
+                message = receivedJSONObject.getString("message");
                 if (mNewMessageEventListener != null) {
                     mNewMessageEventListener.handleEvent(userId, message);
                 }
@@ -110,11 +114,11 @@ public class Api {
         @Override
         public void call(Object... args) {
 
-            Log.d(TAG, "onStartGame");
-            JSONObject data = (JSONObject) args[0];
+            JSONObject receivedJSONObject = (JSONObject) args[0];
+            Log.d(TAG, "onStartGame: receivedJSONObject = " + receivedJSONObject);
             ArrayList<String> wordList = new ArrayList<String>();
             try {
-                JSONArray wordListJsonArray = data.getJSONArray("wordList");
+                JSONArray wordListJsonArray = receivedJSONObject.getJSONArray("wordList");
                 // TODO: save word list to array
 
                 if (mStartGameEventListener != null) {

@@ -1,22 +1,32 @@
 package ritsumeikan.pronunciationtraining;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.speech.RecognizerIntent;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.Profile;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Locale;
 
 public class MessagingActivity extends ActionBarActivity {
@@ -26,16 +36,25 @@ public class MessagingActivity extends ActionBarActivity {
 
     private Dialog mDialogInviteFriendByEmail;
 
-    class SpeechMessage {
+    class UserInfo {
+        public String user_id;
         public String username;
+        public String avatar;
+    }
+    class SpeechMessage {
+        public String user_id;
         public String message;
         public long time_in_secs;
     }
 
     private TextView mCurrentWordTextView;
     private TextView mCurrentTimeLeftTextView;
+
+    private CustomListAdapter mAdapter;
+    private ListView mMessageListView;
+
     private String mClassId;
-    private ArrayList<String> mUsernameArrayList = new ArrayList<String>();
+    private HashMap mUserInfoHashMap = new HashMap();
     private ArrayList<SpeechMessage> mSpeechMessageArrayList = new ArrayList<SpeechMessage>();
     private ArrayList<String> mWordList;
     private int mCurrentWordIndex;
@@ -52,6 +71,45 @@ public class MessagingActivity extends ActionBarActivity {
         }
     };
 
+    class CustomListAdapter extends ArrayAdapter<SpeechMessage> {
+
+        private Context mContext;
+        private int mLayoutResourceId;
+        private ArrayList<SpeechMessage> mSpeechMessageArrayList;
+
+        public CustomListAdapter(Context context, int layoutResourceId, ArrayList<SpeechMessage> speechMessageArrayList){
+            super(context, layoutResourceId, speechMessageArrayList);
+            this.mContext = context;
+            this.mLayoutResourceId = layoutResourceId;
+            this.mSpeechMessageArrayList = speechMessageArrayList;
+        }
+
+        public View getView(int position, View view, ViewGroup parent) {
+            LayoutInflater inflater = ((Activity)mContext).getLayoutInflater();
+            View rowView = inflater.inflate(mLayoutResourceId, parent, false);
+
+            SpeechMessage speechMessage = mSpeechMessageArrayList.get(position);
+            UserInfo userInfo = (UserInfo) mUserInfoHashMap.get(speechMessage.user_id);
+
+            ImageView profilePictureImageView = (ImageView) rowView.findViewById(R.id.profile_picture_image_view);
+            ImageLoader imageLoader = ImageLoader.getInstance();
+            imageLoader.init(ImageLoaderConfiguration.createDefault(mContext));
+            // Load image, decode it to Bitmap and display Bitmap in ImageView (or any other view
+            //  which implements ImageAware interface)
+            imageLoader.displayImage(userInfo.avatar, profilePictureImageView);
+
+            TextView usernameTextView = (TextView) rowView.findViewById(R.id.user_name_text_view);
+            usernameTextView.setText(userInfo.username);
+            TextView messageTextView = (TextView) rowView.findViewById(R.id.message_text_view);
+            messageTextView.setText(speechMessage.message);
+            TextView timestampTextView = (TextView) rowView.findViewById(R.id.time_stamp_text_view);
+            timestampTextView.setText(speechMessage.time_in_secs + " secs");
+
+            return rowView;
+
+        };
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,6 +120,10 @@ public class MessagingActivity extends ActionBarActivity {
 
         mClassId = getIntent().getStringExtra("classId");
         mWordList = getIntent().getStringArrayListExtra("wordList");
+
+        mAdapter = new CustomListAdapter(this, R.layout.message_bubble_layout, mSpeechMessageArrayList);
+        mMessageListView = (ListView)findViewById(R.id.message_líst_view);
+        mMessageListView.setAdapter(mAdapter);
 
         findViewById(R.id.invite_button).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -79,11 +141,15 @@ public class MessagingActivity extends ActionBarActivity {
 
         Api.getInstance().setAddUserEventListener(new Api.AddUserEventListener() {
             @Override
-            public void handleEvent(final String username) {
+            public void handleEvent(final String userId, final String username, final String avatar) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        mUsernameArrayList.add(username);
+                        UserInfo userInfo = new UserInfo();
+                        userInfo.user_id = userId;
+                        userInfo.username = username;
+                        userInfo.avatar = avatar;
+                        mUserInfoHashMap.put(userId, userInfo);
                     }
                 });
             }
@@ -91,16 +157,11 @@ public class MessagingActivity extends ActionBarActivity {
 
         Api.getInstance().setNewMessageEventListener(new Api.NewMessageEventListener() {
             @Override
-            public void handleEvent(final String username, final String message) {
+            public void handleEvent(final String userId, final String message) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        SpeechMessage speechMessage = new SpeechMessage();
-                        speechMessage.username = username;
-                        speechMessage.message = message;
-                        speechMessage.time_in_secs = 0; // TODO : set to current time
-                        mSpeechMessageArrayList.add(speechMessage);
-
+                        addNewMessageBubble(userId, message);
                     }
                 });
             }
@@ -137,6 +198,12 @@ public class MessagingActivity extends ActionBarActivity {
         Profile profile = Profile.getCurrentProfile();
         if (profile != null) {
             Api.getInstance().attemptAddUser(profile.getId());
+
+            UserInfo userInfo = new UserInfo();
+            userInfo.user_id = profile.getId();
+            userInfo.username = profile.getName();
+            userInfo.avatar = profile.getProfilePictureUri(100, 100).toString();
+            mUserInfoHashMap.put(userInfo.user_id, userInfo);
         }
     }
 
@@ -154,6 +221,7 @@ public class MessagingActivity extends ActionBarActivity {
         mCurrentWordIndex++;
         mCurrentWordTextView.setText("word" + (mCurrentWordIndex+1) + ": " + mWordList.get(mCurrentWordIndex));
         mCountDownTimer.start();
+        promptSpeechInput();
     }
 
     private void finishOneWordSession() {
@@ -167,6 +235,17 @@ public class MessagingActivity extends ActionBarActivity {
     private void finishGame() {
         // TODO: transit to result screen
         Api.getInstance().attemptDisconnectGame();
+
+    }
+
+    private void addNewMessageBubble(String userId, String message) {
+
+        SpeechMessage speechMessage = new SpeechMessage();
+        speechMessage.user_id = userId;
+        speechMessage.message = message;
+        speechMessage.time_in_secs = 0; // TODO : set to current time
+        mSpeechMessageArrayList.add(speechMessage);
+        mAdapter.notifyDataSetChanged();
 
     }
 
@@ -224,7 +303,7 @@ public class MessagingActivity extends ActionBarActivity {
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
         intent.putExtra(RecognizerIntent.EXTRA_PROMPT,
-                "Say something&#8230;");
+                "Say something!");
         try {
             startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
         } catch (ActivityNotFoundException a) {
@@ -247,6 +326,14 @@ public class MessagingActivity extends ActionBarActivity {
                             .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
                     // TODO: add message to scroll view
                     //txtSpeechInput.setText(result.get(0));
+                    String recognizedWord = result.get(0);
+                    if (!recognizedWord.equalsIgnoreCase(mWordList.get(mCurrentWordIndex))){
+                        showToastMessage("wrong word: " + recognizedWord);
+                        promptSpeechInput();
+                    }
+
+                    Api.getInstance().attemptSendMessage(recognizedWord);
+                    addNewMessageBubble(Profile.getCurrentProfile().getId(), recognizedWord);
 
                 } else if(resultCode == RecognizerIntent.RESULT_AUDIO_ERROR){
                     showToastMessage("Audio Error");

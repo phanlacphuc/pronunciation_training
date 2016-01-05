@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent" >
 
     <ImageView
-        android:layout_width="75dp"
-        android:layout_height="75dp"
-        android:padding="5dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:padding="20dp"
         android:id="@+id/profile_picture_image_view"
         android:scaleType="fitCenter"
         android:layout_alignParentTop="true"
@@ -14,8 +14,10 @@
 
 
     <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
         android:layout_alignParentTop="true"
         android:layout_alignBottom="@+id/profile_picture_image_view"
         android:layout_toEndOf="@+id/profile_picture_image_view"
@@ -24,22 +26,28 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="Name"
             android:id="@+id/user_name_text_view"
             android:layout_alignParentTop="true" />
 
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="Message"
             android:id="@+id/message_text_view"
             android:layout_below="@+id/user_name_text_view" />
 
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:text="00:00"
             android:id="@+id/time_stamp_text_view"
