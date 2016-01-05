@@ -47,6 +47,12 @@ public class TopScreenActivity extends ActionBarActivity {
             public void onSuccess(LoginResult loginResult) {
                 // App code
                 Log.d(TAG, "facebook login successed. loginResult: " + loginResult.toString());
+                mProfile = Profile.getCurrentProfile();
+                if (mProfile != null) {
+                    login();
+                } else {
+                    mProfileTracker.startTracking();
+                }
             }
 
             @Override
@@ -62,18 +68,19 @@ public class TopScreenActivity extends ActionBarActivity {
             }
         });
 
+        mProfileTracker = new ProfileTracker() {
+            @Override
+            protected void onCurrentProfileChanged(Profile profile, Profile profile2) {
+                mProfile = profile2;
+                mProfileTracker.stopTracking();
+                login();
+            }
+        };
+
         mProfile = Profile.getCurrentProfile();
         if (mProfile != null) {
             login();
         } else {
-            mProfileTracker = new ProfileTracker() {
-                @Override
-                protected void onCurrentProfileChanged(Profile profile, Profile profile2) {
-                    mProfile = profile2;
-                    mProfileTracker.stopTracking();
-                    login();
-                }
-            };
             mProfileTracker.startTracking();
         }
     }
