@@ -131,7 +131,7 @@ public class JoinClassActivity extends ActionBarActivity {
                 public void onSuccess(String classId, ArrayList<String> wordList) {
                     Log.d(TAG, "joined class");
                     Intent intent = new Intent(JoinClassActivity.this, MessagingActivity.class);
-                    intent.putExtra("class_id", classId);
+                    intent.putExtra("classId", classId);
                     intent.putStringArrayListExtra("wordList", wordList);
                     startActivity(intent);
                 }
