@@ -6,6 +6,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -131,7 +132,16 @@ public class TopScreenActivity extends ActionBarActivity {
                     Intent intent = new Intent(TopScreenActivity.this, JoinClassActivity.class);
                     startActivity(intent);
                 }
+
+                @Override
+                public void onFail(String errorMessage) {
+                    showToastMessage(errorMessage);
+                }
             });
         }
+    }
+
+    void showToastMessage(String message){
+        if (message != null) Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 }

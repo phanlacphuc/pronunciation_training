@@ -206,6 +206,11 @@ public class MessagingActivity extends ActionBarActivity {
                 public void onSuccess() {
                     Log.d(TAG, "invited friend");
                 }
+
+                @Override
+                public void onFail(String errorMessage) {
+                    showToastMessage(errorMessage);
+                }
             });
         }
     }
@@ -262,6 +267,6 @@ public class MessagingActivity extends ActionBarActivity {
     }
 
     void showToastMessage(String message){
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        if (message != null) Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 }

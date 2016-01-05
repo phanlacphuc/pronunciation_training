@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.facebook.Profile;
 
@@ -114,6 +115,11 @@ public class JoinClassActivity extends ActionBarActivity {
                     intent.putStringArrayListExtra("wordList", wordList);
                     startActivity(intent);
                 }
+
+                @Override
+                public void onFail(String errorMessage) {
+                    showToastMessage(errorMessage);
+                }
             });
         }
     }
@@ -129,7 +135,16 @@ public class JoinClassActivity extends ActionBarActivity {
                     intent.putStringArrayListExtra("wordList", wordList);
                     startActivity(intent);
                 }
+
+                @Override
+                public void onFail(String errorMessage) {
+                    showToastMessage(errorMessage);
+                }
             });
         }
+    }
+
+    void showToastMessage(String message){
+        if (message != null) Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 }

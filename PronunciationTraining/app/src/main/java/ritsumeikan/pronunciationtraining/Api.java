@@ -27,10 +27,12 @@ public class Api {
 
     public interface OnCustomSuccessListener{
         public void onSuccess();
+        public void onFail(String errorMessage);
     }
 
     public interface OnJoinClassSuccessListener{
         public void onSuccess(String classId, ArrayList<String> wordList);
+        public void onFail(String errorMessage);
     }
 
     public interface AddUserEventListener{
@@ -168,7 +170,16 @@ public class Api {
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 // called when response HTTP status is "200 OK"
                 Log.d(TAG, "response = " + response);
-                onCustomSuccessListener.onSuccess();
+                try {
+                    String errorMessage = response.getString("error");
+                    if (errorMessage == null || errorMessage.length()==0) {
+                        onCustomSuccessListener.onSuccess();
+                    } else {
+                        onCustomSuccessListener.onFail(errorMessage);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
@@ -182,17 +193,22 @@ public class Api {
                 // called when response HTTP status is "200 OK"
                 Log.d(TAG, "response = " + response);
                 try {
-                    JSONObject data = response.getJSONObject("data");
-                    String classId = data.getString("classId");
+                    String errorMessage = response.getString("error");
+                    if (errorMessage == null || errorMessage.length()==0) {
+                        JSONObject data = response.getJSONObject("data");
+                        String classId = data.getString("classId");
 
-                    ArrayList<String> wordList = new ArrayList<String>();
-                    JSONArray wordArray = data.getJSONArray("wordList");
-                    if (wordArray != null) {
-                        for (int i=0;i<wordArray.length();i++){
-                            wordList.add(wordArray.get(i).toString());
+                        ArrayList<String> wordList = new ArrayList<String>();
+                        JSONArray wordArray = data.getJSONArray("wordList");
+                        if (wordArray != null) {
+                            for (int i=0;i<wordArray.length();i++){
+                                wordList.add(wordArray.get(i).toString());
+                            }
                         }
+                        onJoinClassSuccessListener.onSuccess(classId, wordList);
+                    } else {
+                        onJoinClassSuccessListener.onFail(errorMessage);
                     }
-                    onJoinClassSuccessListener.onSuccess(classId, wordList);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -208,7 +224,16 @@ public class Api {
             public void onSuccess(int statusCode, Header[] headers,JSONObject response) {
                 // called when response HTTP status is "200 OK"
                 Log.d(TAG, "response = " + response);
-                onCustomSuccessListener.onSuccess();
+                try {
+                    String errorMessage = response.getString("error");
+                    if (errorMessage == null || errorMessage.length()==0) {
+                        onCustomSuccessListener.onSuccess();
+                    } else {
+                        onCustomSuccessListener.onFail(errorMessage);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
@@ -222,17 +247,22 @@ public class Api {
                 // called when response HTTP status is "200 OK"
                 Log.d(TAG, "response = " + response);
                 try {
-                    JSONObject data = response.getJSONObject("data");
-                    String classId = data.getString("classId");
+                    String errorMessage = response.getString("error");
+                    if (errorMessage == null || errorMessage.length()==0) {
+                        JSONObject data = response.getJSONObject("data");
+                        String classId = data.getString("classId");
 
-                    ArrayList<String> wordList = new ArrayList<String>();
-                    JSONArray wordArray = data.getJSONArray("wordList");
-                    if (wordArray != null) {
-                        for (int i=0;i<wordArray.length();i++){
-                            wordList.add(wordArray.get(i).toString());
+                        ArrayList<String> wordList = new ArrayList<String>();
+                        JSONArray wordArray = data.getJSONArray("wordList");
+                        if (wordArray != null) {
+                            for (int i = 0; i < wordArray.length(); i++) {
+                                wordList.add(wordArray.get(i).toString());
+                            }
                         }
+                        onJoinClassSuccessListener.onSuccess(classId, wordList);
+                    } else {
+                        onJoinClassSuccessListener.onFail(errorMessage);
                     }
-                    onJoinClassSuccessListener.onSuccess(classId, wordList);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
