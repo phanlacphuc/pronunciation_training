@@ -52,7 +52,7 @@ public class Api {
     }
 
 
-    static String BASE_URL = "http://130.211.164.255:3000/";
+    static String BASE_URL = "http://104.197.54.175:3000/";
     static String TAG = "Api";
     static Api ourInstance = new Api();
 
