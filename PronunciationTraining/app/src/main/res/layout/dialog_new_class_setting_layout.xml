@@ -11,7 +11,8 @@
         android:id="@+id/first_word_edit_text"
         android:hint="first word"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:text="hello" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -21,7 +22,8 @@
         android:id="@+id/second_word_edit_text"
         android:hint="second word"
         android:layout_below="@+id/first_word_edit_text"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:text="right" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -31,7 +33,8 @@
         android:id="@+id/third_word_edit_text"
         android:hint="third word"
         android:layout_below="@+id/second_word_edit_text"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:text="linear" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -41,7 +44,8 @@
         android:id="@+id/fourth_word_edit_text"
         android:hint="fourth word"
         android:layout_below="@+id/third_word_edit_text"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:text="orange" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -51,7 +55,8 @@
         android:id="@+id/fifth_word_edit_text"
         android:hint="fifth word"
         android:layout_below="@+id/fourth_word_edit_text"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:text="apple" />
 
     <Button
         android:layout_width="wrap_content"

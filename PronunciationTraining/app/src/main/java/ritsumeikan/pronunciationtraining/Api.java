@@ -101,7 +101,7 @@ public class Api {
             String username;
             String avatar;
             try {
-                userId = receivedJSONObject.getString("userId");
+                userId = receivedJSONObject.getString("userid");
                 message = receivedJSONObject.getString("message");
                 username = receivedJSONObject.getString("username");
                 avatar = receivedJSONObject.getString("avatar");
@@ -171,6 +171,7 @@ public class Api {
     }
 
     public void login(Context context, String facebookId, String name, String avatar, final OnCustomSuccessListener onCustomSuccessListener) {
+        Log.d(TAG, "login api+ facebookId fbname avatar: " +facebookId + " "+ name + " " +avatar);
         RequestParams params = new RequestParams();
         params.add("facebookId", facebookId);
         params.add("name", name);

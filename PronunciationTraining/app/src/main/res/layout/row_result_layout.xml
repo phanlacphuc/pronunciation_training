@@ -14,7 +14,7 @@
 
         <TextView
             android:id="@+id/first_column_text_view"
-            android:layout_width="wrap_content"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:layout_gravity="center_vertical"
@@ -24,7 +24,7 @@
 
         <TextView
             android:id="@+id/second_column_text_view"
-            android:layout_width="wrap_content"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:layout_gravity="center_vertical"
@@ -34,7 +34,7 @@
 
         <TextView
             android:id="@+id/third_column_text_view"
-            android:layout_width="wrap_content"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:layout_gravity="center_vertical"

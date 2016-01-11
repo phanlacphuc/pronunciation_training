@@ -62,7 +62,7 @@ public class MessagingActivity extends ActionBarActivity {
 
     private int mTimeInSecs = 0;
 
-    CountDownTimer mCountDownTimer = new CountDownTimer(31000, 1000) {
+    CountDownTimer mCountDownTimer = new CountDownTimer(16000, 1000) {
 
         public void onTick(long millisUntilFinished) {
             mCurrentTimeLeftTextView.setText("remaining: " + millisUntilFinished / 1000 + " secs");
@@ -161,6 +161,8 @@ public class MessagingActivity extends ActionBarActivity {
                         userInfo.username = username;
                         userInfo.avatar = avatar;
                         mUserInfoHashMap.put(userId, userInfo);
+
+                        addNewMessageBubble(userId, "joined class!", false);
                     }
                 });
             }
