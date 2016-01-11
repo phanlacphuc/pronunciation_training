@@ -4,4 +4,5 @@
     <string name="facebook_app_id">1703386603278549</string>
     <string name="title_activity_messaging">MessagingActivity</string>
     <string name="title_activity_join_class">JoinClassActivity</string>
+    <string name="title_activity_result_screen">ResultScreenActivity</string>
 </resources>

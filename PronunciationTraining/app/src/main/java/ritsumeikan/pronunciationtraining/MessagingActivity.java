@@ -56,14 +56,18 @@ public class MessagingActivity extends ActionBarActivity {
     private String mClassId;
     private HashMap mUserInfoHashMap = new HashMap();
     private ArrayList<SpeechMessage> mSpeechMessageArrayList = new ArrayList<SpeechMessage>();
+    private ArrayList<SpeechMessage> mRightPronunciationArrayList = new ArrayList<SpeechMessage>();
     private ArrayList<String> mWordList;
     private int mCurrentWordIndex;
+
+    private int mTimeInSecs = 0;
 
     CountDownTimer mCountDownTimer = new CountDownTimer(31000, 1000) {
 
         public void onTick(long millisUntilFinished) {
             mCurrentTimeLeftTextView.setText("remaining: " + millisUntilFinished / 1000 + " secs");
             //here you can have your logic to set text to edittext
+            mTimeInSecs++;
         }
 
         public void onFinish() {
@@ -139,6 +143,13 @@ public class MessagingActivity extends ActionBarActivity {
             }
         });
 
+        findViewById(R.id.micro_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                promptSpeechInput();
+            }
+        });
+
         Api.getInstance().setAddUserEventListener(new Api.AddUserEventListener() {
             @Override
             public void handleEvent(final String userId, final String username, final String avatar) {
@@ -157,11 +168,17 @@ public class MessagingActivity extends ActionBarActivity {
 
         Api.getInstance().setNewMessageEventListener(new Api.NewMessageEventListener() {
             @Override
-            public void handleEvent(final String userId, final String message) {
+            public void handleEvent(final String userId, final String message, final String username, final String avatar) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        addNewMessageBubble(userId, message);
+                        boolean rightPronunciation = message.equalsIgnoreCase(mWordList.get(mCurrentWordIndex));
+                        addNewMessageBubble(userId, message, rightPronunciation);
+                        UserInfo userInfo = new UserInfo();
+                        userInfo.user_id = userId;
+                        userInfo.username = username;
+                        userInfo.avatar = avatar;
+                        mUserInfoHashMap.put(userInfo.user_id, userInfo);
                     }
                 });
             }
@@ -218,10 +235,10 @@ public class MessagingActivity extends ActionBarActivity {
     }
 
     private void displayNextWord() {
+        mTimeInSecs = 0;
         mCurrentWordIndex++;
         mCurrentWordTextView.setText("word" + (mCurrentWordIndex+1) + ": " + mWordList.get(mCurrentWordIndex));
         mCountDownTimer.start();
-        promptSpeechInput();
     }
 
     private void finishOneWordSession() {
@@ -233,19 +250,26 @@ public class MessagingActivity extends ActionBarActivity {
     }
 
     private void finishGame() {
-        // TODO: transit to result screen
         Api.getInstance().attemptDisconnectGame();
-
+        Api.getInstance().setRightPronunciationMessageArray(mRightPronunciationArrayList);
+        Api.getInstance().setUserInfoHashMap(mUserInfoHashMap);
+        Intent intent = new Intent(this, ResultScreenActivity.class);
+        intent.putStringArrayListExtra("wordList", mWordList);
+        startActivity(intent);
     }
 
-    private void addNewMessageBubble(String userId, String message) {
+    private void addNewMessageBubble(String userId, String message, boolean rightPronunciation) {
 
         SpeechMessage speechMessage = new SpeechMessage();
         speechMessage.user_id = userId;
         speechMessage.message = message;
-        speechMessage.time_in_secs = 0; // TODO : set to current time
+        speechMessage.time_in_secs = mTimeInSecs;
         mSpeechMessageArrayList.add(speechMessage);
         mAdapter.notifyDataSetChanged();
+
+        if (rightPronunciation) {
+            mRightPronunciationArrayList.add(speechMessage);
+        }
 
     }
 
@@ -301,7 +325,7 @@ public class MessagingActivity extends ActionBarActivity {
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.ENGLISH);
         intent.putExtra(RecognizerIntent.EXTRA_PROMPT,
                 "Say something!");
         try {
@@ -327,13 +351,15 @@ public class MessagingActivity extends ActionBarActivity {
                     // TODO: add message to scroll view
                     //txtSpeechInput.setText(result.get(0));
                     String recognizedWord = result.get(0);
-                    if (!recognizedWord.equalsIgnoreCase(mWordList.get(mCurrentWordIndex))){
+                    Boolean rightPronunciation = recognizedWord.equalsIgnoreCase(mWordList.get(mCurrentWordIndex));
+                    if (!rightPronunciation){
                         showToastMessage("wrong word: " + recognizedWord);
-                        promptSpeechInput();
+                    } else {
+                        showToastMessage("right pronounced!");
                     }
 
                     Api.getInstance().attemptSendMessage(recognizedWord);
-                    addNewMessageBubble(Profile.getCurrentProfile().getId(), recognizedWord);
+                    addNewMessageBubble(Profile.getCurrentProfile().getId(), recognizedWord, rightPronunciation);
 
                 } else if(resultCode == RecognizerIntent.RESULT_AUDIO_ERROR){
                     showToastMessage("Audio Error");

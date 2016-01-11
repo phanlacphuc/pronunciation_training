@@ -61,4 +61,13 @@
         android:layout_alignBottom="@+id/start_button"
         android:layout_alignParentEnd="true"
         android:background="#308342" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="MICRO"
+        android:id="@+id/micro_button"
+        android:layout_alignBottom="@+id/start_button"
+        android:layout_alignParentStart="true"
+        android:background="#e7f30c" />
 </RelativeLayout>

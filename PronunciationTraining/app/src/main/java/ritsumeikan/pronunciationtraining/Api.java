@@ -17,6 +17,7 @@ import org.json.JSONObject;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -40,7 +41,7 @@ public class Api {
     }
 
     public interface NewMessageEventListener{
-        public void handleEvent(String userId, String message);
+        public void handleEvent(String userId, String message, String username, String avatar);
     }
 
     public interface StartGameEventListener{
@@ -56,7 +57,8 @@ public class Api {
     static String TAG = "Api";
     static Api ourInstance = new Api();
 
-    private ArrayList<String> classArray = new ArrayList<String>();
+    private ArrayList<MessagingActivity.SpeechMessage> mRightPronunciationMessageArray;
+    private HashMap mUserInfoHashMap;
 
     private AsyncHttpClient mClient = new AsyncHttpClient();
     private AddUserEventListener mAddUserEventListener;
@@ -96,11 +98,15 @@ public class Api {
             Log.d(TAG, "onNewMessage: receivedJSONObject = " + receivedJSONObject);
             String userId;
             String message;
+            String username;
+            String avatar;
             try {
                 userId = receivedJSONObject.getString("userId");
                 message = receivedJSONObject.getString("message");
+                username = receivedJSONObject.getString("username");
+                avatar = receivedJSONObject.getString("avatar");
                 if (mNewMessageEventListener != null) {
-                    mNewMessageEventListener.handleEvent(userId, message);
+                    mNewMessageEventListener.handleEvent(userId, message, username, avatar);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -335,4 +341,19 @@ public class Api {
         mDisconnectEventListener = disconnectEventListener;
     }
 
+    public void setRightPronunciationMessageArray(ArrayList<MessagingActivity.SpeechMessage> rightPronunciationMessageArray) {
+        mRightPronunciationMessageArray = rightPronunciationMessageArray;
+    }
+
+    ArrayList<MessagingActivity.SpeechMessage> getRightPronunciationMessageArray() {
+        return mRightPronunciationMessageArray;
+    }
+
+    public void setUserInfoHashMap(HashMap hashMap){
+        mUserInfoHashMap = hashMap;
+    }
+
+    HashMap getUserInfoHashMap() {
+        return mUserInfoHashMap;
+    }
 }
